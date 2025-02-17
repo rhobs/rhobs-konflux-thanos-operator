@@ -25,6 +25,8 @@ spec:
     value: quay.io/redhat-user-workloads/rhobs-mco-tenant/rhobs-konflux-thanos-operator:{{revision}}
   - name: dockerfile
     value: Containerfile.thanos-operator
+  - name: build-source-image
+    value: "true"
   pipelineSpec:
     description: |
       This pipeline is ideal for building container images from a Containerfile while maintaining trust after pipeline customization.
