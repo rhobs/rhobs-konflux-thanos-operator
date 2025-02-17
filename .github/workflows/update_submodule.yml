@@ -1,0 +1,68 @@
+name: Update Submodule and Create PR
+
+on:
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  update-submodule:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout Repository with Submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Setup Branch
+        run: |
+          BRANCH_NAME="submodule-update"
+          git fetch origin $BRANCH_NAME:$BRANCH_NAME || true
+          git checkout $BRANCH_NAME || git checkout -b $BRANCH_NAME
+
+      - name: Update Submodules
+        run: |
+          git submodule update --init --remote
+          git status
+
+      - name: Check for Changes
+        id: check_changes
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "changes_detected=true" >> $GITHUB_ENV
+          else
+            echo "No changes in submodule. Exiting."
+            exit 0
+          fi
+
+      - name: Commit Changes
+        if: env.changes_detected == 'true'
+        run: |
+          git add .
+          git commit -m "Update submodule to latest commit"
+
+      - name: Push Changes
+        if: env.changes_detected == 'true'
+        run: |
+          git push -u origin $BRANCH_NAME
+
+      - name: Create or Update Pull Request
+        if: env.changes_detected == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: ${{ env.BRANCH_NAME }}
+          title: "Update Submodule to Latest Commit"
+          body: "This PR updates the submodule to the latest commit."
+          base: main
+          labels: |
+            dependencies
+            automated
+          update: true
