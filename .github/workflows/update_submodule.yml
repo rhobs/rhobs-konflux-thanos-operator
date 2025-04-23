@@ -52,7 +52,7 @@ jobs:
       - name: Push Changes
         if: env.changes_detected == 'true'
         run: |
-          git push -u --set-upstream origin $BRANCH_NAME
+          git push --force -u --set-upstream origin $BRANCH_NAME
 
       - name: Create or Update Pull Request
         if: env.changes_detected == 'true'
