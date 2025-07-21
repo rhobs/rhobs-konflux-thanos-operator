@@ -1,3 +1,5 @@
+namespace: ""
+
 resources:
   - ../../thanos-operator/config/rbac
   - ../../thanos-operator/config/manager
