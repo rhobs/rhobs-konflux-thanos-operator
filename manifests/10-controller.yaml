@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/name: namespace
     app.kubernetes.io/part-of: thanos-operator
     control-plane: controller-manager
-  name: system
+  name: rhobs-stage
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -22,7 +22,7 @@ metadata:
     app.kubernetes.io/name: serviceaccount
     app.kubernetes.io/part-of: thanos-operator
   name: controller-manager
-  namespace: system
+  namespace: rhobs-stage
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -35,6 +35,7 @@ metadata:
     app.kubernetes.io/name: role
     app.kubernetes.io/part-of: thanos-operator
   name: leader-election-role
+  namespace: rhobs-stage
 rules:
 - apiGroups:
   - ""
@@ -506,6 +507,7 @@ metadata:
     app.kubernetes.io/name: rolebinding
     app.kubernetes.io/part-of: thanos-operator
   name: leader-election-rolebinding
+  namespace: rhobs-stage
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -513,7 +515,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: controller-manager
-  namespace: system
+  namespace: rhobs-stage
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -533,7 +535,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: controller-manager
-  namespace: system
+  namespace: rhobs-stage
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -553,7 +555,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: controller-manager
-  namespace: system
+  namespace: rhobs-stage
 ---
 apiVersion: v1
 kind: Service
@@ -567,7 +569,7 @@ metadata:
     app.kubernetes.io/part-of: thanos-operator
     control-plane: controller-manager
   name: controller-manager-metrics-service
-  namespace: system
+  namespace: rhobs-stage
 spec:
   ports:
   - name: https
@@ -589,7 +591,7 @@ metadata:
     app.kubernetes.io/part-of: thanos-operator
     control-plane: controller-manager
   name: controller-manager
-  namespace: system
+  namespace: rhobs-stage
 spec:
   replicas: 1
   selector:
