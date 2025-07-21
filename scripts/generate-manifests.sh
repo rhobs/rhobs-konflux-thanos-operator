@@ -13,7 +13,7 @@ fi
 
 COMMIT_SHA=$(git -C "$SUBMODULE_PATH" rev-parse --short HEAD)
 DATE=$(date +%Y%m%d)
-PKG_VERSION="${PKG_VERSION_PREFIX}-${DATE}-${COMMIT_SHA}"
+PKG_VERSION="${COMMIT_SHA}"
 
 echo "📦 Generating manifests from $SUBMODULE_PATH..."
 mkdir -p "$MANIFEST_DIR"
@@ -28,4 +28,4 @@ kustomize build overlays/no-crds > "$MANIFEST_DIR/10-controller.yaml"
 git add "$MANIFEST_DIR"
 git commit -m "🚀 Sync manifests from thanos-operator@${COMMIT_SHA} (v${PKG_VERSION})"
 
-echo "✅ Manifests committed and tagged as v${PKG_VERSION}"
+echo "✅ Manifests committed and set as v${PKG_VERSION}"
