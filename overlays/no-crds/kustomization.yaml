@@ -1,4 +1,4 @@
-namespace: ""
+namespace: "rhobs-stage"
 
 resources:
   - ../../thanos-operator/config/rbac
