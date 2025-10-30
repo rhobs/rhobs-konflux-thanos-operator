@@ -40,26 +40,14 @@ USER 65532:65532
 
 ENTRYPOINT ["/manager"]
 
-ARG IMAGE_NAME
-ARG IMAGE_DESCRIPTION
-ARG IMAGE_DISPLAY_NAME
-ARG IMAGE_NAME_ARCH
-ARG IMAGE_MAINTAINER
-ARG IMAGE_VENDOR
-ARG IMAGE_VERSION
-ARG IMAGE_RELEASE
-ARG IMAGE_SUMMARY
-ARG IMAGE_OPENSHIFT_TAGS
+ARG VERSION
 
 LABEL org.label-schema.vendor="Red Hat" \
   vendor="Red Hat, Inc." \
   com.redhat.component="rhobs-thanos-operator" \
-  name="$IMAGE_NAME" \
-  maintainer="$IMAGE_MAINTAINER" \
-  version="$IMAGE_VERSION" \
-  release="$IMAGE_RELEASE" \
-  description="rhobs-thanos-operator" \
-  summary="$IMAGE_SUMMARY" \
-  io.k8s.display-name="rhobs-thanos-operator" \
-  io.k8s.description="rhobs-thanos-operator" \
-  io.openshift.tags="$IMAGE_OPENSHIFT_TAGS"
+  name="thanos-operator" \
+  maintainer="team-monitoring@redhat.com" \
+  version="$VERSION" \
+  release="$VERSION" \
+  description="The Thanos Operator provides Kubernetes native deployment and management of Thanos components. The purpose of this project is to simplify and automate the configuration of a Thanos based monitoring stack that would work across different topologies and deployment modes." \
+  summary="Operator to manage Thanos installations"
