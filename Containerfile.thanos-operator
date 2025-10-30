@@ -34,7 +34,7 @@ FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
 WORKDIR /
 
 COPY --from=builder /workspace/manager .
-COPY --from=builder /workspace/LICENSE /licenses/.
+COPY --from=builder /workspace/LICENSE licenses/LICENSE
 
 USER 65532:65532
 
