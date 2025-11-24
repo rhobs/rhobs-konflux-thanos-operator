@@ -1,3 +1,4 @@
 [submodule "thanos-operator"]
 	path = thanos-operator
 	url = https://github.com/thanos-community/thanos-operator
+	branch = main
