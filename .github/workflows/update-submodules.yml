@@ -1,0 +1,64 @@
+name: Update Submodules
+
+on:
+  workflow_dispatch:  # Allows manual triggering
+  schedule:
+    - cron: '0 6 * * *'  # Daily at 06:00 UTC
+
+jobs:
+  update-submodules:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout Repository with Submodules
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          persist-credentials: true
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Show Debugging Info
+        run: |
+          echo "=== Current Branch ==="
+          git branch --show-current
+          echo ""
+          echo "=== Git Submodule Status ==="
+          git submodule status
+
+      - name: Update Submodules
+        run: |
+          git submodule update --init --remote --recursive
+          echo ""
+          echo "=== Git Submodule Status After Update ==="
+          git submodule status
+
+      - name: Stage Submodule Changes
+        run: |
+          git add --update
+          echo ""
+          echo "=== Git Status ==="
+          git status
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: automation/update-submodules-${{ github.run_id }}
+          title: "chore: Update submodules to latest commits"
+          body: |
+            This PR automatically updates the submodules to their latest commits.
+
+            Triggered by workflow run: ${{ github.run_id }}
+          base: main
+          labels: |
+            automation
+            maintenance
+          commit-message: "chore: update submodules to latest commits"
+          delete-branch: true
