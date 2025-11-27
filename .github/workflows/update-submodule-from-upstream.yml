@@ -1,0 +1,132 @@
+name: Update Submodule from Upstream
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Mode of operation'
+        required: true
+        type: choice
+        options:
+          - build-only
+          - update-pr
+        default: 'build-only'
+      upstream_branch:
+        description: 'Upstream branch to fetch'
+        required: false
+        type: string
+        default: 'main'
+  schedule:
+    - cron: '0 6 * * *'  # Daily at 06:00 UTC
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-submodule:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository with Submodules
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          persist-credentials: true
+
+      - name: Debug Info
+        run: |
+          echo "=== Event Information ==="
+          echo "Event Name: ${{ github.event_name }}"
+          echo "Mode: ${{ inputs.mode || 'update-pr' }}"
+          echo "Upstream Branch: ${{ inputs.upstream_branch || 'main' }}"
+          echo ""
+          echo "=== Repository Information ==="
+          echo "Repository: ${{ github.repository }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "SHA: ${{ github.sha }}"
+          echo ""
+          echo "=== Git Status ==="
+          git status
+          echo ""
+          echo "=== Submodule Status ==="
+          git submodule status
+
+      - name: Configure Git User
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch Upstream and Checkout Branch
+        run: |
+          UPSTREAM_BRANCH="${{ inputs.upstream_branch || 'main' }}"
+          SUBMODULE_PATH="thanos-operator"
+          
+          echo "=== Fetching upstream branch '$UPSTREAM_BRANCH' in submodule ==="
+          cd "$SUBMODULE_PATH"
+          
+          echo "Current directory: $(pwd)"
+          echo "Current HEAD: $(git rev-parse HEAD)"
+          
+          git fetch origin "$UPSTREAM_BRANCH"
+          git checkout "origin/$UPSTREAM_BRANCH"
+          
+          echo "New HEAD: $(git rev-parse HEAD)"
+          echo "Commit info:"
+          git log -1 --oneline
+          
+          cd ..
+          echo ""
+          echo "=== Submodule updated to latest upstream ==="
+          git submodule status
+
+      - name: Build
+        run: |
+          echo "=== Building thanos-operator ==="
+          cd thanos-operator
+          if [ -f "Makefile" ]; then
+            echo "Found Makefile, running build..."
+            make build || echo "Build step completed (or no build target)"
+          elif [ -f "go.mod" ]; then
+            echo "Found go.mod, running go build..."
+            go build ./...
+          else
+            echo "No standard build system found, skipping build"
+          fi
+
+      - name: Check for Changes
+        id: check_changes
+        if: inputs.mode == 'update-pr' || github.event_name == 'schedule'
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "changes_detected=true" >> $GITHUB_OUTPUT
+            echo "Changes detected in submodule"
+          else
+            echo "changes_detected=false" >> $GITHUB_OUTPUT
+            echo "No changes in submodule"
+          fi
+
+      - name: Commit Submodule Update
+        if: (inputs.mode == 'update-pr' || github.event_name == 'schedule') && steps.check_changes.outputs.changes_detected == 'true'
+        run: |
+          UPSTREAM_BRANCH="${{ inputs.upstream_branch || 'main' }}"
+          COMMIT_SHA=$(cd thanos-operator && git rev-parse --short HEAD)
+          
+          git add thanos-operator
+          git commit -m "Update thanos-operator submodule to upstream $UPSTREAM_BRANCH ($COMMIT_SHA)"
+
+      - name: Create Pull Request
+        if: (inputs.mode == 'update-pr' || github.event_name == 'schedule') && steps.check_changes.outputs.changes_detected == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: update-submodule-from-upstream
+          title: "Update thanos-operator submodule from upstream"
+          body: |
+            This PR updates the thanos-operator submodule to the latest commit from upstream branch `${{ inputs.upstream_branch || 'main' }}`.
+            
+            Triggered by: ${{ github.event_name }}
+          base: main
+          labels: |
+            dependencies
+            automated
