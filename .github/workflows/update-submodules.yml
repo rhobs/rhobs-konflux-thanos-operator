@@ -42,7 +42,7 @@ jobs:
 
       - name: Stage Submodule Changes
         run: |
-          git add .
+          git add --update
           echo ""
           echo "=== Git Status ==="
           git status
