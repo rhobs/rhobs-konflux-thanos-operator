@@ -12,5 +12,8 @@
     "automergeType": "pr",
     "enabled": true,
     "platformAutomerge": true
-  }
+  },
+  "labels": [
+    "dependencies"
+  ]
 }
