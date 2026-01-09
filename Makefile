@@ -7,3 +7,6 @@ SCRIPTS_DIR := scripts
 update-submodule:
 	$(SCRIPTS_DIR)/update-submodule.sh
 
+## Generate manifests from the current submodule state
+generate-manifests:
+	$(SCRIPTS_DIR)/generate-manifests.sh
