@@ -1,0 +1,10 @@
+apiVersion: package-operator.run/v1alpha1
+kind: PackageInstallation
+metadata:
+  name: thanos-operator
+  namespace: rhobs-stage
+spec:
+  packageRef:
+    name: thanos-operator
+    # use the submodule SHA you synced against, e.g. from-thanos-operator-9fc3ed0
+    version: from-thanos-operator-9fc3ed0
