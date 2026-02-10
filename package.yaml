@@ -1,0 +1,16 @@
+apiVersion: package-operator.run/v1alpha1
+kind: PackageManifest
+metadata:
+  name: thanos-operator
+spec:
+  # We’re installing into a namespace (not cluster‑wide)
+  scopes:
+    - Namespace
+
+  # Single “install” phase: apply CRDs first, then the controller
+  phases:
+    - name: install
+      description: Install Thanos Operator CRDs and controller
+      objects:
+        - manifests/00-crds.yaml
+        - manifests/10-controller.yaml
