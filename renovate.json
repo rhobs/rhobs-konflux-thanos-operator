@@ -14,6 +14,9 @@
     "platformAutomerge": true
   },
   "dependencyDashboard": true,
+  "vulnerabilityAlerts": {
+    "enabled": false
+  },
   "labels": [
     "dependencies"
   ]
